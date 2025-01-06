@@ -1,0 +1,13 @@
+{
+    "name": "koike/koike2712",
+    "description": "A simple PHP web apllication",
+    "autoload": {
+        "psr-4": {
+            "Koike\\Koike2712\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "guzzlehttp/guzzle": "8.0.x-dev"
+    }
+}
