@@ -11,9 +11,6 @@
     </head>
     <body>
         <h3 class="text-center text-info my-4">学習システム</h3>
-        <div class="text-center">
-            <button class="btn btn-outline-primary" onclick="location.href='index.php'">問題を解く</button>
-        </div>
 <?php
     $hostname_db='mysql';
     $username_db='root';
@@ -35,7 +32,7 @@
             'json'=>[
                 'model'=>'gpt-3.5-turbo',
                 'messages'=>[
-                    ['role'=>'system','content'=>'あなたはプログラミングの先生です。プロンプトに復習した内容が乗っています。あなたは復習問題を一つ出してください'],
+                    ['role'=>'system','content'=>'あなたはプログラミングの先生です。問題と回答が渡されます。問題と解答から適切にコメントしてください'],
                     ['role'=>'user','content'=>$prompt]
                 ]
             ]
@@ -54,28 +51,15 @@
         exit();
     }
     $suserId=$_SESSION['phpclass_userid'];
-    mysqli_report(MYSQLI_REPORT_OFF);
-    $link=mysqli_connect($hostname_db,$username_db,$password_db,$dbname_db);
-    if(!$link){exit("障害が起きました。しばらくお待ちください");}
-    $result=mysqli_query($link,"select * from $tablename_db where userId='$suserId'");
-    if(!$result){exit(mysqli_error($link));}
-    $row=mysqli_fetch_assoc($result);
-    $viewnum=$row['viewnum'];
-    mysqli_free_result($result);
-    mysqli_close($link);
-    $pdftext='以下がpdfの内容です。';
-    for($i=1;$i<=$viewnum;$i++){
-        $pdffile='pdf/class'.$i.'.pdf';
-        $pdftext=$i.'回目の講義'.$pdftext.Pdf::getText($pdffile);
-    }
-    #echo $pdftext;
-    $result=generateText($pdftext);
+    $pdftext=$_POST['pdftext'];
+    $answer=$_POST['answer'];
+    $prompt='問題'.$pdftext.'回答'.$answer;
+    $result=generateText($prompt);
+    echo '<textarea name="answer" rows="20" cols="100" readonly>'.$pdftext.'</textarea>';
     echo '<br>'.$result.'<br>';
-    echo '<form method="post" action="prompt2.php">';
-    echo '<textarea name="answer" rows="20" cols="100"></textarea>';
-    echo '<input type="hidden" name="pdftext" value="'.htmlspecialchars($pdftext).'"><br>';
-    echo '<button type="submit" name="comment" class="btn btn-outline-primary">提出</button>';
-    echo '</form>';
+    echo '<a href="prompt.php">もう一度問題を解く</a><br>';
+    echo '<a href="index.php">topに戻る</a>';
+
 ?>
     <body>
 </html>
